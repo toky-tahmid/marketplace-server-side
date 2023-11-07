@@ -56,6 +56,12 @@ async function run() {
       const result = await productCollection.find(query).toArray();
       res.send(result);
     });
+    app.delete("/jobs/:id",async(req,res)=>{
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id)}
+      const result = await productCollection.deleteOne(query)
+      res.send(result); 
+    })
 
     
     app.get("/jobs/:id", async (req, res) => {
@@ -64,6 +70,24 @@ async function run() {
       const result = await productCollection.findOne(query);
       res.send(result);
     });
+    app.put("/postUpdated/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const option = { upsert: true };
+      const JobUpdate = req.body;
+      const update = {
+          $set: {
+              title: JobUpdate.title,
+              deadline: JobUpdate.deadline,
+              minimumPrice: JobUpdate.minimumPrice,
+              maximumPrice: JobUpdate.maximumPrice,
+              description: JobUpdate.description,
+              category: JobUpdate.category,
+          }
+      }
+      const result = await jobCollection.updateOne(filter, update, option)
+      res.send(result)
+  })
 
     app.post("/jobs", async (req, res) => {
       const newJobs = req.body;
