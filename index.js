@@ -32,7 +32,6 @@ const logger = async (req, res, next) => {
   console.log("called:", req.host, req.originalUrl);
   next();
 };
-
 const verifyToken = async (req, res, next) => {
   const token = req?.cookies?.token;
   if (!token) {
@@ -46,7 +45,6 @@ const verifyToken = async (req, res, next) => {
     next();
   });
 };
-
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -69,6 +67,7 @@ async function run() {
         })
         .send({ success: true });
     });
+    //jwt logout update
     app.post("/logout", async (req, res) => {
       const user = req.body;
       console.log("logged out", user);
@@ -151,9 +150,6 @@ async function run() {
       const result = await jobCollection.updateOne(query, updatedService);
       res.send(result);
     });
-
-
-
 
     app.post("/jobs", async (req, res) => {
       const newJobs = req.body;
