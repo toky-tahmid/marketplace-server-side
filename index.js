@@ -54,42 +54,6 @@ async function run() {
     const jobsCollection = client.db("marketPlace").collection("jobs");
     const jobCollection = client.db("marketPlace").collection("myJobs");
 
-
-
-    const bidRequests = [
-      { _id: 1, title: "Job 1", email: "user1@example.com", deadline: "2023-12-01", price: "$500", status: "Pending" },
-      { _id: 2, title: "Job 2", email: "user2@example.com", deadline: "2023-12-15", price: "$800", status: "Pending" },
-      { _id: 3, title: "Job 2", email: "user3@example.com", deadline: "2023-12-15", price: "$800", status: "Pending" },
-    ];
-    
-    app.get("/bidRequests", (req, res) => {
-      res.json(bidRequests);
-    });
-    
-    app.put("/bidRequests/:id/accept", (req, res) => {
-      const { id } = req.params;
-      const requestIndex = bidRequests.findIndex((request) => request._id == id);
-    
-      if (requestIndex !== -1) {
-        bidRequests[requestIndex].status = "Accepted";
-        res.json(bidRequests[requestIndex]);
-      } else {
-        res.status(404).json({ error: "Bid request not found" });
-      }
-    });
-    
-    app.put("/bidRequests/:id/reject", (req, res) => {
-      const { id } = req.params;
-      const requestIndex = bidRequests.findIndex((request) => request._id == id);
-    
-      if (requestIndex !== -1) {
-        bidRequests[requestIndex].status = "Rejected";
-        res.json(bidRequests[requestIndex]);
-      } else {
-        res.status(404).json({ error: "Bid request not found" });
-      }
-    });
-
     //token
     app.post("/jwt",verifyToken,logger, async (req, res) => {
       const user = req.body;
@@ -174,6 +138,22 @@ async function run() {
       const result = await jobsCollection.updateOne(filter, update, option);
       res.send(result);
     });
+   
+    app.patch("/status/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedStatus = req.body;
+      const query = { _id: new ObjectId(id) };
+      const updatedService = {
+        $set: {
+          status: updatedStatus.status,
+        },
+      };
+      const result = await jobCollection.updateOne(query, updatedService);
+      res.send(result);
+    });
+
+
+
 
     app.post("/jobs", async (req, res) => {
       const newJobs = req.body;
