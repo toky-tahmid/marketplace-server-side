@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 app.use(
   cors({
     origin: [
-      // "http://localhost:5173"
+      "http://localhost:5173",
       "https://client-site-1f3aa.web.app",
       "https://client-site-1f3aa.firebaseapp.com"
   ],
@@ -79,15 +79,20 @@ async function run() {
     });
 
     //jobCollection&jobsCollection
-    app.get("/myJobs",async (req, res) => {
+    app.get("/myJobs", async (req, res) => {
       console.log(req.query.email);
       let query = {};
       if (req.query?.email) {
         query = { email: req.query.email };
       }
-      const result = await jobCollection.find(query).toArray();
+      const sortField = req.query.sort === "status" ? "status" : "date"; 
+      const result = await jobCollection.find(query).sort({ [sortField]: 1 }).toArray();
       res.send(result);
     });
+    
+    
+
+    
 
     app.post("/myJobs", async (req, res) => {
       const myJobs = req.body;
